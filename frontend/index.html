@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RegComply AI — Agentic Banking Regulatory Intelligence</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">⚖️</span>
+          <span class="logo-text">RegComply <span class="logo-accent">AI</span></span>
+          <span class="version-badge">v2.0 Agentic</span>
+        </div>
+        <div class="header-sub">Agentic Banking Regulatory Intelligence Platform · ET AI Hackathon</div>
+      </div>
+    </header>
+
+    <!-- Mode Switcher -->
+    <div id="mode-bar" class="mode-bar">
+      <div class="container">
+        <div class="mode-tabs">
+          <button class="mode-tab active" onclick="switchMode('compliance')" id="mode-compliance">
+            🔍 Compliance Analysis
+          </button>
+          <button class="mode-tab" onclick="switchMode('change')" id="mode-change">
+            🔄 Regulatory Change Intelligence
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         MODE: COMPLIANCE ANALYSIS
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="mode-compliance-view">
+
+      <!-- Upload Section -->
+      <section id="upload-section" class="section">
+        <div class="container">
+          <div class="section-title">
+            <h2>Upload Documents</h2>
+            <p>Upload a regulatory document and your bank's internal control policy to begin AI-powered analysis.</p>
+          </div>
+
+          <div class="upload-grid">
+            <div class="upload-card" id="reg-card">
+              <div class="upload-icon">📋</div>
+              <h3>Regulatory Document</h3>
+              <p>RBI circular, Basel III guidelines, SEBI regulations, etc.</p>
+              <div class="upload-controls">
+                <label class="file-label" for="reg-file">
+                  <span>Choose File</span>
+                  <input type="file" id="reg-file" accept=".pdf,.docx,.txt" />
+                </label>
+                <span class="file-name" id="reg-filename">No file chosen</span>
+              </div>
+              <div class="or-divider">or paste text</div>
+              <textarea id="reg-text" placeholder="Paste regulation text here..."></textarea>
+            </div>
+
+            <div class="upload-card" id="ctl-card">
+              <div class="upload-icon">🛡️</div>
+              <h3>Internal Control Policy</h3>
+              <p>Bank's internal policies, procedures, and control frameworks</p>
+              <div class="upload-controls">
+                <label class="file-label" for="ctl-file">
+                  <span>Choose File</span>
+                  <input type="file" id="ctl-file" accept=".pdf,.docx,.txt" />
+                </label>
+                <span class="file-name" id="ctl-filename">No file chosen</span>
+              </div>
+              <div class="or-divider">or paste text</div>
+              <textarea id="ctl-text" placeholder="Paste control policy text here..."></textarea>
+            </div>
+          </div>
+
+          <div class="meta-row">
+            <div class="meta-field">
+              <label>Regulation Name</label>
+              <input type="text" id="reg-name" value="RBI Master Direction on KYC" />
+            </div>
+            <div class="meta-field">
+              <label>Bank Name</label>
+              <input type="text" id="bank-name" value="Sample Bank Ltd." />
+            </div>
+          </div>
+
+          <div class="sample-row">
+            <button class="btn-secondary" onclick="loadSampleData()">Load Sample Data</button>
+            <button class="btn-primary" onclick="runAnalysis()" id="analyze-btn">
+              <span class="btn-icon">🚀</span> Run Agentic Analysis
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading / Pipeline Visualization -->
+      <section id="loading-section" class="section hidden">
+        <div class="container">
+          <div class="pipeline-viz">
+            <div class="pipeline-title">🤖 Agentic Pipeline Running</div>
+            <div class="pipeline-steps">
+              <div class="pipeline-step" id="step-ingest">
+                <div class="step-icon">📥</div>
+                <div class="step-label">Document Ingestion</div>
+                <div class="step-status pending">Pending</div>
+                <div class="step-detail" id="detail-ingest"></div>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" id="step-obligations">
+                <div class="step-icon">📌</div>
+                <div class="step-label">Obligation Extractor</div>
+                <div class="step-status pending">Pending</div>
+                <div class="step-detail" id="detail-obligations"></div>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" id="step-controls">
+                <div class="step-icon">🛡️</div>
+                <div class="step-label">Control Analyzer</div>
+                <div class="step-status pending">Pending</div>
+                <div class="step-detail" id="detail-controls"></div>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" id="step-mapping">
+                <div class="step-icon">🔗</div>
+                <div class="step-label">Coverage Mapper</div>
+                <div class="step-status pending">Pending</div>
+                <div class="step-detail" id="detail-mapping"></div>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" id="step-gaps">
+                <div class="step-icon">⚠️</div>
+                <div class="step-label">Gap Analyzer</div>
+                <div class="step-status pending">Pending</div>
+                <div class="step-detail" id="detail-gaps"></div>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" id="step-remediation">
+                <div class="step-icon">💊</div>
+                <div class="step-label">Remediation Agent</div>
+                <div class="step-status pending">Pending</div>
+                <div class="step-detail" id="detail-remediation"></div>
+              </div>
+            </div>
+          </div>
+          <div class="loading-spinner"></div>
+          <div class="loading-msg" id="loading-msg">Initializing agentic pipeline...</div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section id="results-section" class="section hidden">
+        <div class="container">
+
+          <!-- Results Header -->
+          <div class="results-header">
+            <div class="results-title-row">
+              <h2 id="results-title">Compliance Report</h2>
+              <div class="results-actions">
+                <button class="btn-outline small" onclick="exportReport()">📥 Export JSON</button>
+                <button class="btn-secondary small" onclick="resetAnalysis()">← New Analysis</button>
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-text" id="exec-summary"></div>
+            </div>
+          </div>
+
+          <!-- Score Dashboard -->
+          <div class="score-dashboard">
+            <!-- Circular gauge -->
+            <div class="gauge-card">
+              <div class="gauge-wrap">
+                <svg class="gauge-svg" viewBox="0 0 120 120">
+                  <circle class="gauge-bg" cx="60" cy="60" r="52" />
+                  <circle class="gauge-fill" id="gauge-fill" cx="60" cy="60" r="52"
+                    stroke-dasharray="326.7" stroke-dashoffset="326.7" />
+                </svg>
+                <div class="gauge-label">
+                  <span class="gauge-value" id="gauge-value">--</span>
+                  <span class="gauge-sub">Compliance Score</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="stat-cards">
+              <div class="stat-card stat-green">
+                <div class="stat-value" id="score-full">--</div>
+                <div class="stat-label">✅ Fully Covered</div>
+              </div>
+              <div class="stat-card stat-orange">
+                <div class="stat-value" id="score-partial">--</div>
+                <div class="stat-label">⚡ Partially Covered</div>
+              </div>
+              <div class="stat-card stat-red">
+                <div class="stat-value" id="score-none">--</div>
+                <div class="stat-label">❌ Not Covered</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="score-total">--</div>
+                <div class="stat-label">📋 Total Obligations</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="score-controls">--</div>
+                <div class="stat-label">🛡️ Controls Analyzed</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What-if Simulator trigger -->
+          <div class="whatif-bar">
+            <span class="whatif-label">🧪 What-if Simulator</span>
+            <span class="whatif-desc">Simulate regulatory changes and see how they would impact your compliance posture</span>
+            <button class="btn-accent" onclick="openSimulator()">Run Simulation</button>
+          </div>
+
+          <!-- Tabs -->
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('traceability', this)">🔗 Traceability Chain</button>
+            <button class="tab" onclick="showTab('gaps', this)">⚠️ Gap Analysis</button>
+            <button class="tab" onclick="showTab('remediation', this)">💊 Remediation Plan</button>
+            <button class="tab" onclick="showTab('controls', this)">🛡️ Control Effectiveness</button>
+            <button class="tab" onclick="showTab('obligations', this)">📌 All Obligations</button>
+          </div>
+
+          <!-- Traceability Tab -->
+          <div id="tab-traceability" class="tab-content active">
+            <div class="tab-header">
+              <h3>Regulation → Obligation → Control → Gap → Remediation</h3>
+              <p>Full end-to-end traceability chain for every regulatory obligation</p>
+            </div>
+            <div id="traceability-list"></div>
+          </div>
+
+          <!-- Gaps Tab -->
+          <div id="tab-gaps" class="tab-content">
+            <div class="tab-header">
+              <h3>Compliance Gaps — Risk Prioritized</h3>
+            </div>
+            <div id="gaps-list"></div>
+          </div>
+
+          <!-- Remediation Tab -->
+          <div id="tab-remediation" class="tab-content">
+            <div class="tab-header">
+              <h3>Remediation Action Plan</h3>
+            </div>
+            <div id="remediation-list"></div>
+          </div>
+
+          <!-- Controls Tab (Effectiveness) -->
+          <div id="tab-controls" class="tab-content">
+            <div class="tab-header">
+              <h3>Control Effectiveness Assessment</h3>
+              <p>AI-scored effectiveness for each internal control</p>
+            </div>
+            <div id="controls-list"></div>
+          </div>
+
+          <!-- Obligations Tab -->
+          <div id="tab-obligations" class="tab-content">
+            <div class="tab-header">
+              <h3>All Extracted Obligations</h3>
+            </div>
+            <div id="obligations-list"></div>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /mode-compliance-view -->
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         MODE: REGULATORY CHANGE INTELLIGENCE
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="mode-change-view" class="hidden">
+      <section class="section">
+        <div class="container">
+          <div class="section-title">
+            <h2>🔄 Regulatory Change Intelligence</h2>
+            <p>Compare two versions of a regulation to detect amendments, new requirements, and compliance impact.</p>
+          </div>
+
+          <div class="upload-grid">
+            <div class="upload-card">
+              <div class="upload-icon">📄</div>
+              <h3>Previous Version</h3>
+              <p>Older version of the regulation</p>
+              <div class="upload-controls">
+                <label class="file-label" for="old-reg-file">
+                  <span>Choose File</span>
+                  <input type="file" id="old-reg-file" accept=".pdf,.docx,.txt" onchange="updateFileName('old-reg-file','old-reg-filename')" />
+                </label>
+                <span class="file-name" id="old-reg-filename">No file chosen</span>
+              </div>
+              <div class="or-divider">or paste text</div>
+              <textarea id="old-reg-text" placeholder="Paste previous regulation version here..."></textarea>
+            </div>
+
+            <div class="upload-card" style="border-color: var(--accent);">
+              <div class="upload-icon">📄</div>
+              <h3>New Version</h3>
+              <p>Updated / amended version of the regulation</p>
+              <div class="upload-controls">
+                <label class="file-label" for="new-reg-file">
+                  <span>Choose File</span>
+                  <input type="file" id="new-reg-file" accept=".pdf,.docx,.txt" onchange="updateFileName('new-reg-file','new-reg-filename')" />
+                </label>
+                <span class="file-name" id="new-reg-filename">No file chosen</span>
+              </div>
+              <div class="or-divider">or paste text</div>
+              <textarea id="new-reg-text" placeholder="Paste new regulation version here..."></textarea>
+            </div>
+          </div>
+
+          <div class="meta-row">
+            <div class="meta-field">
+              <label>Regulation Name</label>
+              <input type="text" id="change-reg-name" value="RBI Master Direction on KYC" />
+            </div>
+          </div>
+
+          <div class="sample-row">
+            <button class="btn-secondary" onclick="loadChangeSample()">Load Sample Data</button>
+            <button class="btn-primary" onclick="runChangeAnalysis()" id="change-analyze-btn">
+              <span class="btn-icon">🔄</span> Detect Regulatory Changes
+            </button>
+          </div>
+
+          <!-- Change Results -->
+          <div id="change-loading" class="change-loading hidden">
+            <div class="loading-spinner"></div>
+            <div>Analyzing regulatory changes with AI...</div>
+          </div>
+
+          <div id="change-results" class="hidden">
+            <div class="change-summary-card" id="change-impact-summary"></div>
+            <div class="change-stats-row">
+              <div class="change-stat">
+                <div class="change-stat-val" id="chg-total">--</div>
+                <div class="change-stat-lbl">Total Changes</div>
+              </div>
+              <div class="change-stat" style="color:var(--danger)">
+                <div class="change-stat-val" id="chg-critical">--</div>
+                <div class="change-stat-lbl">Critical</div>
+              </div>
+              <div class="change-stat" style="color:var(--warning)">
+                <div class="change-stat-val" id="chg-high">--</div>
+                <div class="change-stat-lbl">High Impact</div>
+              </div>
+            </div>
+            <div id="changes-list"></div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /mode-change-view -->
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SIMULATION MODAL
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div id="sim-modal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>🧪 What-if Compliance Simulator</h3>
+          <button class="modal-close" onclick="closeSimulator()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">
+            Describe a hypothetical regulatory change or scenario and the AI will simulate its impact
+            on your current compliance posture.
+          </p>
+          <div class="sim-examples">
+            <span class="sim-example-label">Examples:</span>
+            <button class="example-chip" onclick="setScenario(this.textContent)">RBI reduces KYC refresh interval for high-risk customers from 2 years to 6 months</button>
+            <button class="example-chip" onclick="setScenario(this.textContent)">New SEBI rule requires real-time transaction reporting for all trades above ₹50 lakhs</button>
+            <button class="example-chip" onclick="setScenario(this.textContent)">Our AML transaction monitoring system is breached and temporarily unavailable for 30 days</button>
+          </div>
+          <textarea id="sim-scenario" rows="4" placeholder="Describe the regulatory scenario to simulate..."></textarea>
+          <button class="btn-primary full-width" onclick="runSimulation()" id="sim-btn">
+            <span class="btn-icon">🚀</span> Run Simulation
+          </button>
+          <div id="sim-loading" class="sim-loading hidden">
+            <div class="loading-spinner small"></div>
+            <span>Simulating compliance impact...</span>
+          </div>
+          <div id="sim-results" class="sim-results hidden"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app -->
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
