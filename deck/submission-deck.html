@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>regComply-AI — ET AI Hackathon Submission</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #060E1F;
+    --navy2: #0B1A35;
+    --card: #0F2248;
+    --card2: #162B52;
+    --blue: #1A6FFF;
+    --blue-light: #4D94FF;
+    --gold: #F5A623;
+    --gold-light: #FFD07A;
+    --text: #E8EDF8;
+    --muted: #8FA3C8;
+    --green: #22C55E;
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --border: rgba(255,255,255,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #030A18;
+    color: var(--text);
+  }
+
+  /* ── Screen view ─────────────────────────────────────────── */
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    margin: 0 auto 40px;
+    background: var(--navy);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  /* ── Print: one slide per page ────────────────────────────── */
+  @page { size: 1280px 720px; margin: 0; }
+  @media print {
+    html, body { background: var(--navy); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide {
+      width: 1280px;
+      height: 720px;
+      min-height: 720px;
+      margin: 0;
+      break-after: page;
+      border: none;
+      border-radius: 0;
+    }
+    .nav { display: none; }
+  }
+  body.single .slide { display: none; margin: 0; border: none; border-radius: 0; height: 720px; }
+  body.single .slide.show { display: flex; }
+  body.single .nav { display: none; }
+
+  /* ── Decorative chrome ────────────────────────────────────── */
+  .slide::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--blue), var(--gold), var(--blue-light));
+  }
+
+  .slide-num {
+    position: absolute;
+    bottom: 24px; right: 32px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  .logo-mark {
+    position: absolute;
+    top: 20px; right: 32px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ── Typography ───────────────────────────────────────────── */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  h1 { font-size: 64px; font-weight: 900; line-height: 1.05; }
+  h2 { font-size: 40px; font-weight: 800; line-height: 1.15; }
+  h3 { font-size: 22px; font-weight: 700; }
+  h4 { font-size: 16px; font-weight: 600; }
+
+  .subtitle { font-size: 20px; color: var(--muted); font-weight: 400; line-height: 1.6; }
+  .body { font-size: 15px; color: var(--muted); line-height: 1.7; }
+
+  /* ── Layout helpers ───────────────────────────────────────── */
+  .pad { padding: 56px 72px; flex: 1; display: flex; flex-direction: column; }
+  .pad-sm { padding: 40px 72px; flex: 1; display: flex; flex-direction: column; }
+  .row { display: flex; gap: 24px; }
+  .col { flex: 1; display: flex; flex-direction: column; }
+  .center { align-items: center; justify-content: center; text-align: center; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .gap-16 { gap: 16px; }
+  .gap-20 { gap: 20px; }
+  .gap-32 { gap: 32px; }
+  .mt-auto { margin-top: auto; }
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+  .mt-32 { margin-top: 32px; }
+  .mt-40 { margin-top: 40px; }
+
+  /* ── Cards ────────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card-sm { padding: 16px 20px; }
+  .card-accent { border-color: var(--blue); border-width: 1.5px; }
+
+  /* ── Stat tiles ───────────────────────────────────────────── */
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat-num { font-size: 42px; font-weight: 900; line-height: 1; color: var(--gold); }
+  .stat-label { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; }
+
+  /* ── Tags ─────────────────────────────────────────────────── */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .tag-blue { background: rgba(26,111,255,0.2); color: var(--blue-light); border: 1px solid rgba(26,111,255,0.35); }
+  .tag-gold { background: rgba(245,166,35,0.2); color: var(--gold); border: 1px solid rgba(245,166,35,0.35); }
+  .tag-green { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .tag-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .tag-amber { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+
+  /* ── Check list ───────────────────────────────────────────── */
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .check-list li { position: relative; padding-left: 22px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+  .check-list li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--green); font-weight: 700; }
+  .check-list li.miss::before { content: '○'; color: var(--muted); }
+
+  /* ── Pipeline nodes ───────────────────────────────────────── */
+  .pipeline { display: flex; align-items: center; gap: 0; }
+  .pipe-node {
+    background: var(--card);
+    border: 1.5px solid var(--blue);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: center;
+    flex: 1;
+  }
+  .pipe-node .icon { font-size: 22px; margin-bottom: 6px; }
+  .pipe-node h4 { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .pipe-node p { font-size: 10px; color: var(--muted); line-height: 1.4; }
+  .pipe-arrow {
+    color: var(--blue-light);
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+  }
+
+  /* ── Feature matrix ───────────────────────────────────────── */
+  .feature-row {
+    display: flex;
+    align-items: center;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    gap: 12px;
+  }
+  .feature-row:nth-child(odd) { background: rgba(255,255,255,0.03); }
+  .feature-num { width: 20px; font-size: 11px; color: var(--muted); flex-shrink: 0; font-weight: 600; }
+  .feature-name { flex: 1; color: var(--muted); }
+  .feature-status { width: 80px; text-align: center; flex-shrink: 0; }
+
+  /* ── 9-blocker grid ───────────────────────────────────────── */
+  .nine-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .nine-cell {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    aspect-ratio: 1.4;
+    background: var(--card);
+    position: relative;
+  }
+  .nine-cell.active {
+    background: rgba(26,111,255,0.25);
+    border-color: var(--blue);
+    color: var(--blue-light);
+    font-size: 16px;
+  }
+  .nine-cell.active::after {
+    content: '★ Our position';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--gold);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  /* ── Tech badge ───────────────────────────────────────────── */
+  .tech-badge {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tech-badge .tech-icon { font-size: 18px; }
+
+  /* ── Roadmap ──────────────────────────────────────────────── */
+  .roadmap-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+  .roadmap-phase {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+  }
+  .roadmap-phase:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: var(--blue-light);
+    z-index: 1;
+  }
+  .roadmap-phase:first-child { border-radius: 10px 0 0 10px; }
+  .roadmap-phase:last-child { border-radius: 0 10px 10px 0; }
+  .roadmap-phase h4 { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 12px; }
+
+  /* ── Impact bar ───────────────────────────────────────────── */
+  .impact-bar { height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+  .impact-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--blue), var(--gold)); }
+
+  /* ── Cover specific ───────────────────────────────────────── */
+  .glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26,111,255,0.12) 0%, transparent 70%);
+    top: -200px; right: -150px;
+    pointer-events: none;
+  }
+  .glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,166,35,0.08) 0%, transparent 70%);
+    bottom: -150px; left: -100px;
+    pointer-events: none;
+  }
+
+  /* ── Divider ──────────────────────────────────────────────── */
+  .divider { width: 48px; height: 3px; background: var(--gold); border-radius: 2px; margin: 16px 0; }
+  .divider-blue { background: var(--blue); }
+
+  /* ── Quote ────────────────────────────────────────────────── */
+  .quote {
+    border-left: 3px solid var(--gold);
+    padding: 12px 20px;
+    background: rgba(245,166,35,0.06);
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* ── Nav (screen only) ────────────────────────────────────── */
+  @media screen {
+    .nav {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(11,26,53,0.95);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 10px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .nav a { color: var(--blue-light); text-decoration: none; font-weight: 600; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 1 — COVER
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="glow"></div>
+  <div class="glow2"></div>
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">ET AI Hackathon: Agentic Edition · Problem Statement 1</div>
+    <h1 style="font-size:72px; background: linear-gradient(135deg, #fff 30%, #4D94FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">
+      regComply<span style="-webkit-text-fill-color:var(--gold)">-AI</span>
+    </h1>
+    <div style="font-size:22px; font-weight:600; color:var(--blue-light); margin-top:8px; letter-spacing:0.02em;">
+      Agentic Banking Regulatory Intelligence Platform
+    </div>
+    <div class="divider" style="margin-top:28px;"></div>
+    <p class="subtitle" style="max-width:600px; margin-top:8px;">
+      A 7-agent AI pipeline that transforms raw regulatory documents into an actionable, traceable compliance intelligence chain — from obligation extraction to board-level remediation plans.
+    </p>
+
+    <div class="row mt-40 gap-32" style="max-width:640px;">
+      <div class="stat">
+        <span class="stat-num">11</span>
+        <span class="stat-label">of 14 features covered</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">7</span>
+        <span class="stat-label">specialized AI agents</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">F3/D2</span>
+        <span class="stat-label">9-blocker position</span>
+      </div>
+    </div>
+
+    <div class="mt-auto" style="display:flex; align-items:center; gap:16px; padding-top:32px; border-top:1px solid var(--border);">
+      <span class="tag tag-blue">Banking · RegTech</span>
+      <span class="tag tag-gold">Agentic AI</span>
+      <span class="tag tag-green">Full-Stack Prototype</span>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">01 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 2 — TEAM
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">Meet the team</div>
+    <h2>Team Introduction</h2>
+    <div class="divider divider-blue mt-16"></div>
+
+    <div class="row mt-40 gap-20">
+      <div class="card col gap-16" style="align-items:flex-start;">
+        <div class="row gap-24" style="width:100%;">
+          <div style="display:flex;align-items:center;gap:14px;flex:1;">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-light));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;">RS</div>
+            <div>
+              <h3 style="font-size:19px;">Rahul Sain</h3>
+              <p style="color:var(--muted);font-size:13px;margin-top:2px;">Co-developer</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;flex:1;">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amber));color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;">AB</div>
+            <div>
+              <h3 style="font-size:19px;">Ansh Bhardwaj</h3>
+              <p style="color:var(--muted);font-size:13px;margin-top:2px;">Co-developer</p>
+            </div>
+          </div>
+        </div>
+        <div class="divider divider-blue" style="width:32px;margin:0;"></div>
+        <div style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0.08em;">WHAT WE BUILT</div>
+        <ul class="check-list" style="gap:8px;">
+          <li>Solution architecture &amp; agentic pipeline design</li>
+          <li>Backend engineering (FastAPI, Python)</li>
+          <li>LLM prompt engineering (OpenAI / Groq / Anthropic)</li>
+          <li>Frontend UI / UX (SSE streaming dashboard)</li>
+          <li>Domain specialization: Indian banking regulation (RBI, SEBI, Basel III)</li>
+        </ul>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <span class="tag tag-blue">AI/ML</span>
+          <span class="tag tag-gold">RegTech</span>
+          <span class="tag tag-green">Full-Stack</span>
+        </div>
+      </div>
+
+      <div class="card col" style="background:var(--card2);">
+        <div class="eyebrow" style="font-size:10px;">Submission context</div>
+        <h4 style="font-size:16px; margin-bottom:12px;">Problem Statement</h4>
+        <div class="quote">
+          "Develop an agentic solution that understands regulatory requirements and how they change over time, assesses banks' internal control mechanisms, identifies gaps, and suggests appropriate remedies."
+        </div>
+        <div class="mt-24">
+          <h4 style="font-size:14px; color:var(--muted); margin-bottom:12px;">Why this problem?</h4>
+          <ul class="check-list">
+            <li>Banks paid ~$321B in fines between 2008 and 2016 (BCG Global Risk 2017)</li>
+            <li>Manual gap analysis is slow and document-heavy; our pipeline does a first pass in one automated run</li>
+            <li>Regulations change constantly — change intelligence is table stakes</li>
+            <li>Perfect match for agentic AI: multi-step reasoning, traceable outputs</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">02 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 3 — PROBLEM STATEMENT
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="pad-sm" style="justify-content:center;">
+    <div class="eyebrow">The challenge</div>
+    <h2>Banking Compliance Is Broken</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-32 gap-20">
+      <div class="col gap-16">
+        <div class="card card-sm" style="border-color:rgba(239,68,68,0.3);">
+          <div style="font-size:28px; font-weight:900; color:var(--red);">~$321B</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">in fines paid by banks between 2008 and 2016 (BCG Global Risk 2017)</div>
+        </div>
+        <div class="card card-sm" style="border-color:rgba(245,158,11,0.3);">
+          <div style="font-size:28px; font-weight:900; color:var(--amber);">Manual</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">obligation-to-control mapping usually lives in spreadsheets maintained by analysts</div>
+        </div>
+        <div class="card card-sm" style="border-color:rgba(26,111,255,0.3);">
+          <div style="font-size:28px; font-weight:900; color:var(--blue-light);">Reactive</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;">gaps tend to surface at audit or inspection time, not before</div>
+        </div>
+      </div>
+
+      <div class="col gap-16" style="flex:2;">
+        <div class="card" style="flex:1;">
+          <h4 style="color:var(--red); margin-bottom:16px;">Current State Pain Points</h4>
+          <ul class="check-list">
+            <li style="color:var(--text);">Regulations ingested manually — spreadsheets, emails, sticky notes</li>
+            <li style="color:var(--text);">No traceability: can't link a control to the specific obligation it addresses</li>
+            <li style="color:var(--text);">Gap discovery is reactive — found during audits, not proactively</li>
+            <li style="color:var(--text);">Regulatory changes require expensive re-analysis from scratch</li>
+            <li style="color:var(--text);">Remediation plans are ad hoc with no risk prioritization</li>
+            <li style="color:var(--text);">No "what-if" capability to model new regulatory scenarios</li>
+          </ul>
+        </div>
+        <div class="card" style="background: linear-gradient(135deg, rgba(26,111,255,0.1), rgba(245,166,35,0.05)); border-color:var(--blue);">
+          <h4 style="color:var(--blue-light); margin-bottom:12px;">The Core Challenge</h4>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; font-weight:600;">
+            <span class="tag tag-blue">Regulations</span>
+            <span style="color:var(--muted);">→</span>
+            <span class="tag tag-blue">Obligations</span>
+            <span style="color:var(--muted);">→</span>
+            <span class="tag tag-gold">Controls</span>
+            <span style="color:var(--muted);">→</span>
+            <span class="tag tag-gold">Evidence</span>
+            <span style="color:var(--muted);">→</span>
+            <span class="tag tag-amber">Gaps</span>
+            <span style="color:var(--muted);">→</span>
+            <span class="tag tag-green">Remediation</span>
+            <span style="color:var(--muted);">→</span>
+            <span class="tag tag-green">Monitoring</span>
+          </div>
+          <p style="font-size:13px; color:var(--muted); margin-top:12px;">Maintaining this continuous, evolving, and auditable chain is the core problem — and it is exactly the chain regComply-AI's agents build.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">03 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 4 — PROPOSED SOLUTION
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">Our solution</div>
+    <h2>regComply-AI: The Intelligent Compliance Chain</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-24 gap-20">
+      <div class="col gap-16">
+        <p class="body">
+          Banks upload regulations and internal control policies. Seven specialized agents analyze, map, score and remediate, producing a traceable compliance picture.
+        </p>
+
+        <div class="card card-accent">
+          <h4 style="color:var(--blue-light); margin-bottom:12px;">What makes it agentic</h4>
+          <ul class="check-list" style="gap:8px;">
+            <li>Each agent has a <strong style="color:var(--text);">single, specialized role</strong>; its output feeds the next agent</li>
+            <li>Agents <strong style="color:var(--text);">reason over structured JSON</strong> with confidence scoring</li>
+            <li>JSON recovery logic handles partial/malformed LLM outputs</li>
+            <li>Pipeline streams real-time progress via Server-Sent Events</li>
+            <li>Simulation agent reasons over hypothetical future scenarios</li>
+          </ul>
+        </div>
+
+        <div class="card card-sm" style="background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.25);">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:6px;">Compliance score (deterministic, computed from agent mappings)</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:var(--green);">score = (Full + 0.5 × Partial) ÷ Total × 100</div>
+        </div>
+      </div>
+
+      <div class="col gap-16" style="flex:1.2;">
+        <div class="card" style="background:var(--card2);">
+          <h4 style="color:var(--gold); font-size:14px; margin-bottom:12px;">Solution Output: one compliance intelligence report</h4>
+          <ul class="check-list" style="display:grid; grid-template-columns:1fr 1fr; gap:8px 16px;">
+            <li>Obligations with regulation references</li>
+            <li>AI-scored controls (0–100)</li>
+            <li>Full / Partial / None mapping + confidence</li>
+            <li>Risk-ranked gap register</li>
+            <li>Remediation: owner, timeline, effort</li>
+            <li>Board-level executive summary</li>
+            <li>Regulatory change impact analysis</li>
+            <li>What-if score projections</li>
+          </ul>
+        </div>
+
+        <div class="card" style="background:var(--card2);">
+          <h4 style="color:var(--gold); margin-bottom:12px;">Three operating modes</h4>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="tag tag-blue" style="flex-shrink:0;">ANALYZE</span>
+              <span style="font-size:13px;color:var(--muted);">Full 6-agent pipeline: obligations → controls → mapping → gaps → remediation</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="tag tag-gold" style="flex-shrink:0;">CHANGE</span>
+              <span style="font-size:13px;color:var(--muted);">Regulatory change intelligence: compare old vs. new regulation versions</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="tag tag-green" style="flex-shrink:0;">SIMULATE</span>
+              <span style="font-size:13px;color:var(--muted);">What-if scenarios: model proposed regulations before they take effect</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">04 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 5 — ARCHITECTURE
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="pad-sm" style="justify-content:center;">
+    <div class="eyebrow">Technical architecture</div>
+    <h2>7-Agent Sequential Pipeline</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="mt-24" style="display:flex;flex-direction:column;gap:16px;">
+      <!-- Input layer -->
+      <div style="display:flex;gap:12px;align-items:stretch;">
+        <div class="card card-sm" style="background:rgba(26,111,255,0.1);border-color:var(--blue);display:flex;align-items:center;gap:12px;padding:12px 20px;">
+          <div style="font-size:24px;">📄</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--blue-light);">INPUT LAYER</div>
+            <div style="font-size:11px;color:var(--muted);">PDF · DOCX · TXT · Plain text paste</div>
+          </div>
+        </div>
+        <div style="flex:1;"></div>
+        <div class="card card-sm" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.3);display:flex;align-items:center;gap:12px;padding:12px 20px;">
+          <div style="font-size:24px;">🖥</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--green);">OUTPUT LAYER</div>
+            <div style="font-size:11px;color:var(--muted);">SSE stream · JSON export · UI dashboard</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pipeline -->
+      <div class="pipeline" style="gap:0;">
+        <div class="pipe-node" style="border-color:var(--blue);">
+          <div class="icon">🔍</div>
+          <h4>Agent 1<br>Obligation Extractor</h4>
+          <p>Extracts 6–8 structured obligations per regulation with categories &amp; references</p>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:#6B5CE7;">
+          <div class="icon">🛡</div>
+          <h4>Agent 2<br>Control Analyzer</h4>
+          <p>Extracts 5–8 controls with effectiveness score (0–100), type &amp; automation level</p>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:#22C55E;">
+          <div class="icon">🔗</div>
+          <h4>Agent 3<br>Coverage Mapper</h4>
+          <p>Maps obligations → controls: Full / Partial / None with confidence score</p>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:var(--amber);">
+          <div class="icon">⚠️</div>
+          <h4>Agent 4<br>Gap Analyzer</h4>
+          <p>Risk-scores gaps 1–100 (Critical / High / Medium / Low) with reasoning</p>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:var(--gold);">
+          <div class="icon">🔧</div>
+          <h4>Agent 5<br>Remediation</h4>
+          <p>Action plans with owner, timeline, effort + board-level executive summary</p>
+        </div>
+      </div>
+
+      <!-- Standalone agents -->
+      <div class="row gap-16">
+        <div class="pipe-node col" style="border-color:rgba(245,166,35,0.5); flex-direction:row; align-items:center; gap:16px; padding:14px 20px;">
+          <div style="font-size:24px;">📊</div>
+          <div style="text-align:left;">
+            <h4 style="font-size:12px;">Agent 6 — Regulatory Change Intelligence</h4>
+            <p style="font-size:10px; margin-top:4px;">Diffs old vs. new regulation → detects New / Amended / Removed / Stricter / Relaxed requirements with CRO impact summary</p>
+          </div>
+        </div>
+        <div class="pipe-node col" style="border-color:rgba(34,197,94,0.5); flex-direction:row; align-items:center; gap:16px; padding:14px 20px;">
+          <div style="font-size:24px;">🔮</div>
+          <div style="text-align:left;">
+            <h4 style="font-size:12px;">Agent 7 — What-if Simulation</h4>
+            <p style="font-size:10px; margin-top:4px;">Takes natural-language scenario → projects compliance score delta, new gaps, required actions, simulation narrative</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infra -->
+      <div style="display:flex;gap:16px;align-items:center;padding:12px 16px;background:var(--card2);border-radius:10px;border:1px solid var(--border);">
+        <span style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.1em;">INFRASTRUCTURE</span>
+        <span class="tag tag-blue">FastAPI + uvicorn</span>
+        <span class="tag tag-blue">SSE streaming</span>
+        <span class="tag tag-green">OpenAI / Groq / Anthropic (switchable)</span>
+        <span class="tag tag-gold">Vanilla JS dashboard</span>
+        <span class="tag tag-blue">pdfplumber + python-docx</span>
+        <span class="tag tag-green">Pydantic v2 schemas</span>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">05 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 6 — AI MODELS & TECHNOLOGIES
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">AI models &amp; technologies</div>
+    <h2>Engineering Stack</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-32 gap-24">
+      <div class="col gap-16">
+        <h4 style="color:var(--gold);">LLM Layer <span style="font-size:12px;font-weight:500;color:var(--muted);">· one env var switches provider</span></h4>
+        <div class="card" style="gap:12px;display:flex;flex-direction:column;">
+          <div class="tech-badge" style="border-color:rgba(34,197,94,0.4);">
+            <span class="tech-icon">🧠</span>
+            <div>
+              <div style="font-size:13px; font-weight:700;">OpenAI (used in the demo)</div>
+              <div style="font-size:11px;color:var(--muted);">gpt-4.1 · temperature 0.1 · model set via OPENAI_MODEL</div>
+            </div>
+          </div>
+          <div class="tech-badge">
+            <span class="tech-icon">⚡</span>
+            <div>
+              <div style="font-size:13px; font-weight:700;">Groq</div>
+              <div style="font-size:11px;color:var(--muted);">openai/gpt-oss-120b · OpenAI-compatible endpoint · temperature 0.1</div>
+            </div>
+          </div>
+          <div class="tech-badge">
+            <span class="tech-icon">🤖</span>
+            <div>
+              <div style="font-size:13px; font-weight:700;">Anthropic Claude (Alternative)</div>
+              <div style="font-size:11px;color:var(--muted);">claude-haiku-4-5-20251001 · same JSON-schema prompts</div>
+            </div>
+          </div>
+          <div class="card card-sm" style="background:rgba(26,111,255,0.08);border-color:rgba(26,111,255,0.2);">
+            <div style="font-size:12px;font-weight:600;color:var(--blue-light);margin-bottom:6px;">Reliability Engineering</div>
+            <ul class="check-list" style="gap:6px;">
+              <li>Markdown fence stripping from LLM output</li>
+              <li>Thinking tag removal (Qwen3-style &lt;think&gt; blocks)</li>
+              <li>Truncated JSON array recovery</li>
+              <li>Depth-tracking JSON salvage on parse failure</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col gap-16">
+        <h4 style="color:var(--gold);">Full Tech Stack</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="tech-badge"><span class="tech-icon">🐍</span><div><div style="font-size:12px;font-weight:700;">Python 3.10+</div><div style="font-size:10px;color:var(--muted);">Primary language</div></div></div>
+          <div class="tech-badge"><span class="tech-icon">⚡</span><div><div style="font-size:12px;font-weight:700;">FastAPI</div><div style="font-size:10px;color:var(--muted);">REST + SSE API</div></div></div>
+          <div class="tech-badge"><span class="tech-icon">🚀</span><div><div style="font-size:12px;font-weight:700;">uvicorn (ASGI)</div><div style="font-size:10px;color:var(--muted);">Async server</div></div></div>
+          <div class="tech-badge"><span class="tech-icon">📄</span><div><div style="font-size:12px;font-weight:700;">pdfplumber</div><div style="font-size:10px;color:var(--muted);">PDF extraction</div></div></div>
+          <div class="tech-badge"><span class="tech-icon">📝</span><div><div style="font-size:12px;font-weight:700;">python-docx</div><div style="font-size:10px;color:var(--muted);">Word extraction</div></div></div>
+          <div class="tech-badge"><span class="tech-icon">✅</span><div><div style="font-size:12px;font-weight:700;">Pydantic v2</div><div style="font-size:10px;color:var(--muted);">Schema validation</div></div></div>
+          <div class="tech-badge"><span class="tech-icon">🌐</span><div><div style="font-size:12px;font-weight:700;">SSE (EventSource)</div><div style="font-size:10px;color:var(--muted);">Real-time streaming</div></div></div>
+          <div class="tech-badge"><span class="tech-icon">🖼</span><div><div style="font-size:12px;font-weight:700;">Vanilla JS/HTML</div><div style="font-size:10px;color:var(--muted);">No-framework UI</div></div></div>
+        </div>
+
+        <div class="card card-sm" style="background:rgba(245,166,35,0.08);border-color:rgba(245,166,35,0.25);font-size:13px;color:var(--muted);line-height:1.6;">
+          <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:6px;">Prompt Strategy</div>
+          All agents use <strong style="color:var(--text);">schema-constrained JSON prompting</strong>, with no orchestration framework (LangChain, AutoGen, CrewAI). Conservative instruction: <em>"Gaps are valuable findings — do not force-fit poor matches."</em>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">06 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 7 — PRODUCT DEMO
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="pad-sm" style="justify-content:center;">
+    <div class="eyebrow">Product demo</div>
+    <h2>Walkthrough: RBI KYC Compliance Analysis</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-24 gap-20">
+      <div class="col gap-12" style="flex:1.2;">
+        <!-- Step-by-step demo flow -->
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card card-sm" style="flex-direction:row;display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;">1</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);">Upload Documents</div>
+              <div style="font-size:12px;color:var(--muted);">RBI Master Direction on KYC (regulation) + Bank's KYC Policy Manual (controls). Drag &amp; drop or paste text.</div>
+            </div>
+          </div>
+          <div class="card card-sm" style="flex-direction:row;display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;">2</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);">Live Pipeline Execution</div>
+              <div style="font-size:12px;color:var(--muted);">SSE stream shows each agent activating in real time — obligation extraction → control scoring → mapping → gap analysis → remediation.</div>
+            </div>
+          </div>
+          <div class="card card-sm" style="flex-direction:row;display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;">3</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);">Compliance Dashboard</div>
+              <div style="font-size:12px;color:var(--muted);">Score gauge, coverage stat cards, executive summary and a 5-tab report: Traceability · Gaps · Remediation · Controls · Obligations.</div>
+            </div>
+          </div>
+          <div class="card card-sm" style="flex-direction:row;display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--navy);flex-shrink:0;">4</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);">Change Intelligence</div>
+              <div style="font-size:12px;color:var(--muted);">Compare the 2022 and 2024 versions. Agent 6 found 14 changes (2 Critical) typed as New / Amended / Removed / Stricter / Relaxed, with a CRO-level impact summary.</div>
+            </div>
+          </div>
+          <div class="card card-sm" style="flex-direction:row;display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--navy);flex-shrink:0;">5</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);">What-if Simulation</div>
+              <div style="font-size:12px;color:var(--muted);">"RBI reduces KYC refresh for high-risk customers from 2 years to 6 months" → projected score 54% (−7), 1 new High gap, 3 required actions.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col gap-12" style="flex:1;">
+        <h4 style="color:var(--gold); font-size:14px;">What the agents have to catch</h4>
+        <div class="card" style="background:var(--card2);">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Regulation · clause 1.2</div>
+          <div style="font-size:13px;color:var(--text);">"Fresh KYC … High Risk — <strong style="color:var(--green);">every 2 years</strong>"</div>
+          <div style="font-size:11px;color:var(--muted);margin:12px 0 6px;">Bank policy · CTL-C</div>
+          <div style="font-size:13px;color:var(--text);">"High Risk customers <strong style="color:var(--red);">every 3 years</strong>"</div>
+          <div style="font-size:11px;color:var(--amber);margin-top:12px;">A control exists, but it is weaker than the obligation. Live run: the Mapper rated it <strong>Partial (0.7)</strong> and the Gap agent raised GAP-006.</div>
+        </div>
+        <div class="card card-sm" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.25);">
+          <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:6px;">Recorded live run · built-in sample · gpt-4.1</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div><div style="font-size:20px;font-weight:800;color:var(--green);">18 / 18</div><div style="font-size:10px;color:var(--muted);">clauses extracted as obligations</div></div>
+            <div><div style="font-size:20px;font-weight:800;color:var(--red);">9 gaps</div><div style="font-size:10px;color:var(--muted);">2 Critical · 3 High · 3 Medium · 1 Low</div></div>
+            <div><div style="font-size:20px;font-weight:800;color:var(--amber);">61.1%</div><div style="font-size:10px;color:var(--muted);">weighted score (9 Full · 4 Partial · 5 None)</div></div>
+            <div><div style="font-size:20px;font-weight:800;color:var(--blue-light);">~31 s</div><div style="font-size:10px;color:var(--muted);">end to end, 6 LLM calls</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">07 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 8 — FEATURE COVERAGE MATRIX
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="pad-sm" style="justify-content:center;">
+    <div class="eyebrow">Solution coverage</div>
+    <h2>Feature Coverage vs. Hackathon Requirements</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-24 gap-24">
+      <div class="col" style="flex:1.8;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+          <div class="feature-row">
+            <span class="feature-num">01</span>
+            <span class="feature-name">Regulatory knowledge ingestion</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">02</span>
+            <span class="feature-name">Regulatory change intelligence</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">03</span>
+            <span class="feature-name">Obligation extraction</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">04</span>
+            <span class="feature-name">Control-framework understanding</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">05</span>
+            <span class="feature-name">Regulatory-to-control mapping</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">06</span>
+            <span class="feature-name">Control effectiveness assessment</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">07</span>
+            <span class="feature-name">Evidence-based assessment</span>
+            <span class="feature-status"><span class="tag tag-amber">Partial</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">08</span>
+            <span class="feature-name">Gap identification</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">09</span>
+            <span class="feature-name">Risk-based gap prioritization</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">10</span>
+            <span class="feature-name">Remediation recommendation engine</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">11</span>
+            <span class="feature-name">Autonomous regulatory impact analysis</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">12</span>
+            <span class="feature-name">What-if / simulation capability</span>
+            <span class="feature-status"><span class="tag tag-green">Full</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">13</span>
+            <span class="feature-name">Cross-regulation intelligence</span>
+            <span class="feature-status"><span class="tag tag-amber">Roadmap</span></span>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">14</span>
+            <span class="feature-name">Regulatory contradiction detection</span>
+            <span class="feature-status"><span class="tag tag-amber">Roadmap</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col gap-16" style="flex:1;">
+        <div class="card" style="background:linear-gradient(135deg,rgba(26,111,255,0.15),rgba(245,166,35,0.08));border-color:var(--blue);">
+          <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;">Hackathon Threshold</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:var(--muted);">F1 — ≥3 features</span>
+              <span class="tag tag-green">✓ Pass</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:var(--muted);">F2 — ≥6 features</span>
+              <span class="tag tag-green">✓ Pass</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:var(--muted);">F3 — ≥8 features</span>
+              <span class="tag tag-green">✓ Pass (11+)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;">Solution Depth</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:var(--muted);">D1 — Textual, acceptable</span>
+              <span class="tag tag-green">✓ Exceeded</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:var(--muted);">D2 — Textual, high reliability</span>
+              <span class="tag tag-gold">✓ Claimed</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:var(--muted);">D3 — Multimodal</span>
+              <span class="tag tag-amber">Roadmap</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(26,111,255,0.1));border-color:rgba(34,197,94,0.4);">
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Self-declared position</div>
+            <div style="font-size:40px;font-weight:900;color:var(--green);">F3 / D2</div>
+            <div style="font-size:12px;color:var(--muted);">11 of 14 features · structured-text input with built-in reliability controls</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">08 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 9 — BUSINESS IMPACT
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">Business impact</div>
+    <h2>Business Value for Banking Institutions</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-16 gap-20">
+      <div class="col gap-16">
+        <div class="card" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(26,111,255,0.05));border-color:rgba(34,197,94,0.3);">
+          <h4 style="color:var(--green);font-size:14px;margin-bottom:8px;">Productivity · Faster first pass</h4>
+          <div class="stat"><span class="stat-num" style="color:var(--green);font-size:30px;">1 run</span><span class="stat-label">replaces a document-by-document manual read for the first-pass gap analysis; analysts review findings instead of building them</span></div>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg,rgba(26,111,255,0.1),rgba(245,166,35,0.05));border-color:rgba(26,111,255,0.3);">
+          <h4 style="color:var(--blue-light);font-size:14px;margin-bottom:8px;">Risk reduction · Earlier detection</h4>
+          <div class="stat"><span class="stat-num" style="color:var(--blue-light);font-size:30px;">Pre-audit</span><span class="stat-label">gaps and weak controls are surfaced and risk-ranked before an inspection finds them; change analysis runs the day an amendment lands</span></div>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg,rgba(245,166,35,0.1),rgba(239,68,68,0.05));border-color:rgba(245,166,35,0.3);">
+          <h4 style="color:var(--gold);font-size:14px;margin-bottom:8px;">Fine avoidance · Better decisions</h4>
+          <div class="stat"><span class="stat-num" style="color:var(--gold);font-size:30px;">What-if</span><span class="stat-label">leadership sees the projected compliance impact of a proposed rule before it takes effect and budgets remediation early</span></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);">Quantified savings to be measured in a pilot against the bank's current manual baseline.</div>
+      </div>
+
+      <div class="col gap-16">
+        <div class="card" style="flex:1;">
+          <h4 style="color:var(--gold);margin-bottom:16px;">Who Benefits</h4>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:20px;">🏦</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;">Compliance Teams</div>
+                <div style="font-size:12px;color:var(--muted);">Automated first-pass analysis. Focus analyst time on judgment, not document hunting.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:20px;">👔</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;">CRO / Board</div>
+                <div style="font-size:12px;color:var(--muted);">Board-ready executive summaries. Real-time compliance score. Risk-prioritized gap register.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:20px;">⚖️</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;">Internal Audit</div>
+                <div style="font-size:12px;color:var(--muted);">Full traceability chain from regulation to control to evidence. Audit-ready output.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:20px;">📊</span>
+              <div>
+                <div style="font-size:14px;font-weight:700;">RegTech / Consultancies</div>
+                <div style="font-size:12px;color:var(--muted);">White-label platform to accelerate client compliance engagements.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-sm" style="background:rgba(26,111,255,0.08);border-color:rgba(26,111,255,0.25);">
+          <div style="font-size:12px;font-weight:600;color:var(--blue-light);margin-bottom:8px;">Target Market</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="tag tag-blue">Indian PSBs &amp; Private Banks</span>
+            <span class="tag tag-blue">NBFCs</span>
+            <span class="tag tag-gold">RBI / SEBI regulated entities</span>
+            <span class="tag tag-green">Basel III compliant institutions</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">09 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 10 — SCALABILITY & RESPONSIBLE AI
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">Scalability &amp; Responsible AI</div>
+    <h2>Built to Scale. Built to Be Trusted.</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-24 gap-20">
+      <div class="col gap-12">
+        <h4 style="color:var(--gold);">Scalability Architecture</h4>
+        <div class="card" style="flex:1;">
+          <ul class="check-list" style="gap:8px;">
+            <li><strong style="color:var(--text);">Stateless FastAPI backend</strong>: scales horizontally behind a load balancer</li>
+            <li><strong style="color:var(--text);">SSE streaming</strong>: long pipelines run without HTTP timeouts</li>
+            <li><strong style="color:var(--text);">Async executor</strong>: LLM calls run in a thread pool; the event loop stays responsive</li>
+            <li><strong style="color:var(--text);">Independent analyses</strong>: no shared state between runs, so batch mode is a queue away</li>
+            <li><strong style="color:var(--text);">Long documents</strong>: next step is chunked retrieval to replace today's 8,000-character input cap</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col gap-12">
+        <h4 style="color:var(--gold);">Responsible AI &amp; Trust</h4>
+        <div class="card" style="flex:1;">
+          <ul class="check-list" style="gap:8px;">
+            <li><strong style="color:var(--text);">Full traceability</strong>: every gap links to the exact obligation and control behind it</li>
+            <li><strong style="color:var(--text);">Confidence scoring</strong>: a 0–1 confidence per mapping, shown in the traceability view</li>
+            <li><strong style="color:var(--text);">Conservative prompting</strong>: agents prefer reporting a gap over force-fitting a match</li>
+            <li><strong style="color:var(--text);">Low temperature (0.1)</strong>: OpenAI and Groq calls tuned for repeatable, schema-conformant output</li>
+            <li><strong style="color:var(--text);">Provider-switchable</strong>: OpenAI, Groq or Anthropic Claude via one env var</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-16 gap-20">
+      <div class="card card-sm" style="flex:1;background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25);">
+        <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;">Hallucination Mitigation</div>
+        <p style="font-size:12px;color:var(--muted);">Every agent is prompted for an exact JSON schema. Recovery logic salvages complete items from truncated output instead of guessing. Every mapping carries a confidence score.</p>
+      </div>
+      <div class="card card-sm" style="flex:1;background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);">
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;">Privacy &amp; Security</div>
+        <p style="font-size:12px;color:var(--muted);">Documents are processed in memory and nothing is persisted server-side. Text is sent only to the configured LLM provider; self-hosted models are on the roadmap for on-premises use.</p>
+      </div>
+      <div class="card card-sm" style="flex:1;background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.25);">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">Human Oversight</div>
+        <p style="font-size:12px;color:var(--muted);">AI generates findings; humans validate. Every gap includes AI reasoning so compliance officers can verify or override the assessment.</p>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">10 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 11 — FUTURE ROADMAP
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">Future roadmap</div>
+    <h2>What Comes Next</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="roadmap-row mt-32">
+      <div class="roadmap-phase">
+        <h4>Phase 1 · Now</h4>
+        <ul class="check-list" style="font-size:12px;">
+          <li>6-agent core pipeline (working)</li>
+          <li>Regulatory change intelligence</li>
+          <li>What-if simulation</li>
+          <li>SSE real-time streaming</li>
+          <li>OpenAI / Groq / Anthropic providers</li>
+        </ul>
+        <div style="margin-top:16px;"><span class="tag tag-green">✓ Shipped</span></div>
+      </div>
+      <div class="roadmap-phase">
+        <h4>Phase 2 · Next 3 months</h4>
+        <ul class="check-list" style="font-size:12px;">
+          <li>Chunked retrieval for long documents (vector store)</li>
+          <li>Multimodal input (image/table OCR)</li>
+          <li>Cross-regulation intelligence (F13)</li>
+          <li>Contradiction detection (F14)</li>
+          <li>Evidence document ingestion (F7)</li>
+        </ul>
+        <div style="margin-top:16px;"><span class="tag tag-blue">Next</span></div>
+      </div>
+      <div class="roadmap-phase">
+        <h4>Phase 3 · 3–6 months</h4>
+        <ul class="check-list" style="font-size:12px;">
+          <li>Continuous monitoring (webhook on regulatory feeds)</li>
+          <li>Multi-bank / multi-jurisdiction tenancy</li>
+          <li>Compliance posture history &amp; trending</li>
+          <li>Audit trail with digital signatures</li>
+          <li>Regulator-facing report export</li>
+        </ul>
+        <div style="margin-top:16px;"><span class="tag tag-amber">Planned</span></div>
+      </div>
+      <div class="roadmap-phase">
+        <h4>Phase 4 · 6–12 months</h4>
+        <ul class="check-list" style="font-size:12px;">
+          <li>Trainable on bank-specific policy corpus</li>
+          <li>Fine-tuned compliance reasoning model</li>
+          <li>API integration with core banking systems</li>
+          <li>Real-time regulatory feed connectors (RBI, SEBI, BIS)</li>
+          <li>Enterprise SaaS and self-hosted LLM option for on-prem banks</li>
+        </ul>
+        <div style="margin-top:16px;"><span class="tag tag-amber">Planned</span></div>
+      </div>
+    </div>
+
+    <div class="card mt-16" style="background:rgba(26,111,255,0.08);border-color:rgba(26,111,255,0.3);display:flex;gap:24px;align-items:center;">
+      <div style="font-size:13px;font-weight:700;color:var(--blue-light);white-space:nowrap;">Path to F3 / D3</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;">Phase 2 closes the three open features (F7 evidence, F13 cross-regulation, F14 contradictions) and adds multimodal input. Together with a repeat-run consistency benchmark, that is the evidence needed for a D3 claim.</div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">11 / 12</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 12 — CLOSING
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="glow"></div>
+  <div class="glow2"></div>
+  <div class="pad" style="justify-content:center;">
+    <div class="eyebrow">Summary</div>
+    <h2>Claimed Position &amp; Takeaway</h2>
+    <div class="divider mt-16"></div>
+
+    <div class="row mt-32 gap-32" style="align-items:center;">
+      <div class="col gap-16" style="flex:1;">
+        <h4 style="color:var(--gold);font-size:14px;">9-Blocker Grid — Claimed Position</h4>
+        <div style="display:flex;gap:24px;align-items:flex-start;">
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-align:center;margin-bottom:6px;">SOLUTION FEATURES →</div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <div style="font-size:10px;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);margin-right:4px;">DEPTH ↑</div>
+              <div class="nine-grid" style="width:260px;">
+                <!-- Row D3 (top) -->
+                <div class="nine-cell"><span style="font-size:10px;">F1/D3</span></div>
+                <div class="nine-cell"><span style="font-size:10px;">F2/D3</span></div>
+                <div class="nine-cell"><span style="font-size:10px;">F3/D3</span></div>
+                <!-- Row D2 (middle) -->
+                <div class="nine-cell"><span style="font-size:10px;">F1/D2</span></div>
+                <div class="nine-cell"><span style="font-size:10px;">F2/D2</span></div>
+                <div class="nine-cell active"><span>F3/D2</span></div>
+                <!-- Row D1 (bottom) -->
+                <div class="nine-cell"><span style="font-size:10px;">F1/D1</span></div>
+                <div class="nine-cell"><span style="font-size:10px;">F2/D1</span></div>
+                <div class="nine-cell"><span style="font-size:10px;">F3/D1</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.8;flex:1;">
+            <strong style="color:var(--text);">F3:</strong> 11 of 14 features fully covered (plus F7 partially), including simulation, change intelligence and risk-prioritized remediation.<br><br>
+            <strong style="color:var(--text);">D2:</strong> Structured textual input (PDF/DOCX/TXT), schema-constrained prompts, JSON recovery, per-mapping confidence and conservative "prefer a gap over a forced match" prompting.
+          </div>
+        </div>
+      </div>
+
+      <div class="card col" style="flex:1; background:linear-gradient(135deg,var(--navy2),rgba(26,111,255,0.08)); border-color:var(--blue); text-align:center; align-items:center; justify-content:center; padding:32px;">
+        <div style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:8px;">regComply-AI</div>
+        <div style="font-size:40px;font-weight:900;background:linear-gradient(135deg,#fff,var(--blue-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;">Regulations to<br>Remediation.<br>One agentic run.</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:16px;">ET AI Hackathon: Agentic Edition<br>Problem Statement 1 — Banking/Financial Regulations</div>
+        <div style="margin-top:20px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <span class="tag tag-green">F3/D2</span>
+          <span class="tag tag-blue">7 Agents</span>
+          <span class="tag tag-gold">11 Features</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-mark">regComply-AI</div>
+  <div class="slide-num">12 / 12</div>
+</div>
+
+<!-- ── Print tip (screen only) ─────────────────────────── -->
+<div class="nav">
+  regComply-AI Pitch Deck · 12 slides ·
+  <a href="javascript:window.print()">Print to PDF</a>
+  · Open in browser, use <strong>Print → Save as PDF</strong> · Set paper to Landscape, A4/Letter
+</div>
+
+</body>
+</html>

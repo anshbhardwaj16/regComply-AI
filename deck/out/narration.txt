@@ -1,0 +1,35 @@
+This is RegComply AI, an agentic regulatory intelligence platform for banks, built for problem statement one of the ET AI Hackathon.
+
+Banks paid over three hundred billion dollars in fines between 2008 and 2016. Mapping obligations to controls is still manual, so gaps surface at audit time, and every amendment restarts the work.
+
+Seven specialised agents do the work. They extract obligations and controls, map each obligation to its best control with a confidence score, risk-score the gaps, and write a remediation plan and a board summary. Two more agents handle regulatory change and what-if simulation.
+
+Let's run it live on the built-in sample: the RBI KYC master direction, and a bank policy with eight controls.
+
+One click starts the pipeline, and each agent reports progress as it finishes.
+
+Done in about 31 seconds. 18 obligations: 9 fully covered, 4 partially, 5 not at all. A score of 61.1 percent.
+
+Traceability links each obligation to its clause, matched control, confidence, gap and fix. Here, it caught that the bank refreshes high-risk KYC every three years, where the regulation requires two.
+
+9 gaps, ranked by risk, 2 of them critical. The top risk, scored 95 out of 100, is clause 2.2: Apply Enhanced Due Diligence to PEPs, non-resident customers, and customers from high-risk countries.
+
+Each gap gets an action, an owner, a timeline and an effort estimate.
+
+Controls are scored for effectiveness, type and automation.
+
+What if RBI cut the high-risk KYC refresh to six months?
+
+The simulator projects a score of 54 percent, down 7 points, and lists the new gaps and the actions required.
+
+Finally, change intelligence: comparing the 2022 and 2024 versions.
+
+The agent found 14 changes, 2 critical, each with an action and a timeline.
+
+We fully cover eleven of the fourteen listed features, and evidence-based assessment partially, so we claim F3, D2: structured text input, with schema-constrained prompts, explicit parameter checks, and confidence scores.
+
+For banks, that means a faster first pass, gaps found before an inspection finds them, and early sight of a proposed rule's impact.
+
+Every finding is traceable and explained, the score is computed in code, and compliance officers make the final call.
+
+RegComply AI. Regulations to remediation, in one agentic run. Thank you.
