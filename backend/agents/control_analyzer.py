@@ -7,7 +7,7 @@ Analyze the following internal policy/control document and extract ALL distinct 
 For each control output:
 - id: e.g. "CTL-001"
 - policy_ref: document section reference if present
-- text: clear description of what the control does (under 25 words)
+- text: clear description of what the control does (under 35 words). Keep every specific parameter exactly as written: frequencies, deadlines, thresholds, amounts, retention periods and scope (e.g. "every 3 years", "within 3 business days", "during induction").
 - category: one of [Capital Adequacy, Liquidity, Risk Management, Governance, Reporting, KYC/AML, Consumer Protection, Cybersecurity, Operational]
 - owner: responsible department/role (infer if not explicit)
 - effectiveness_score: integer 0-100 estimating control effectiveness based on specificity, completeness, and automation level described in the text
@@ -18,10 +18,10 @@ For each control output:
 Control Document:
 {text}
 
-Return a JSON array. Extract exactly 5-8 controls. Be accurate with effectiveness scores.
+Return a JSON array. Extract every distinct control (up to 15). Be accurate with effectiveness scores.
 Return ONLY valid JSON — no markdown fences, no explanation."""
 
 
 def extract_controls(control_text: str) -> list[dict]:
-    raw = llm_call(EXTRACT_PROMPT.format(text=control_text[:8000]), max_tokens=2500)
+    raw = llm_call(EXTRACT_PROMPT.format(text=control_text[:8000]), max_tokens=4000)
     return parse_json_response(raw)

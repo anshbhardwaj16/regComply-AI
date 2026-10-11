@@ -29,7 +29,7 @@ Compliance Analysis Results:
 - Fully Covered: {full}
 - Partially Covered: {partial}
 - Not Covered: {none}
-- Compliance Score: {score:.1f}%
+- Weighted Compliance Score: {score:.1f}% (Full counts 1, Partial counts 0.5)
 - Critical Gaps: {critical}
 - High Risk Gaps: {high}
 
@@ -37,13 +37,15 @@ Top Gaps:
 {top_gaps}
 
 Write a 3-4 sentence executive summary for the bank's board. Be direct about risks and urgency.
+Quote the counts exactly as given. If you mention the score, call it the weighted compliance score;
+never describe it as a percentage of obligations covered.
 Return only the summary text, no JSON."""
 
 
 def generate_remediations(gaps: list[dict]) -> list[dict]:
     if not gaps:
         return []
-    raw = llm_call(PROMPT.format(gaps=json.dumps(gaps, indent=2)), max_tokens=2000)
+    raw = llm_call(PROMPT.format(gaps=json.dumps(gaps, indent=2)), max_tokens=3500)
     return parse_json_response(raw)
 
 

@@ -48,5 +48,5 @@ def analyze_gaps(obligations: list[dict], mappings: list[dict]) -> list[dict]:
 
     raw = llm_call(PROMPT.format(
         obligations_with_coverage=json.dumps(gaps_to_analyze, indent=2)
-    ), max_tokens=2000)
+    ), max_tokens=3500)
     return parse_json_response(raw)

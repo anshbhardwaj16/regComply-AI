@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Submission build intermediates (deck/build.py)
+deck/out/work/
+deck/out/demo/
+deck/out/slides/
