@@ -22,6 +22,17 @@ def _call_groq(prompt: str, max_tokens: int = 4096) -> str:
     return response.choices[0].message.content.strip()
 
 
+def _call_openai(prompt: str, max_tokens: int = 4096) -> str:
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    response = client.chat.completions.create(
+        model=os.getenv("OPENAI_MODEL", "gpt-4.1"),
+        messages=[{"role": "user", "content": prompt}],
+        max_completion_tokens=max_tokens,
+        temperature=0.1,
+    )
+    return response.choices[0].message.content.strip()
+
+
 def _call_anthropic(prompt: str, max_tokens: int = 4096) -> str:
     client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
     message = client.messages.create(
@@ -36,6 +47,8 @@ def llm_call(prompt: str, max_tokens: int = 1500) -> str:
     provider = get_provider()
     if provider == "anthropic":
         return _call_anthropic(prompt, max_tokens)
+    elif provider == "openai":
+        return _call_openai(prompt, max_tokens)
     else:
         return _call_groq(prompt, max_tokens)
 
